@@ -101,10 +101,23 @@ class Book(models.Model):
     
     
     def __str__(self):
-        self.title
+        return self.title
 
     def get_absolute_url(self):
         return reverse("book_detail", args=[str(self.id)])
+    
+      
+    def display_genre(self):
+        """
+        Crea un string para el género. Esto es requerido para mostrar el genero en el panel de administracion de django. 
+        """
+        return ', '.join(genre.name for genre in self.genre.all()[:3])
+    
+    """
+        short_description se utiliza para cambiar el nombre de un método o campo calculado en el panel de administración de Django.
+        Hace que los nombres sean más legibles y fáciles de entender para los administradores del sitio.
+    """
+    display_genre.short_description = "Genre"
     
 class BookInstance(models.Model):
     """
