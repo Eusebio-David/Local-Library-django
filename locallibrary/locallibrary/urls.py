@@ -20,6 +20,9 @@ from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 
+"""
+    La clase RedirectView en Django es una vista genérica que te permite redirigir a los usuarios de una URL a otra de manera sencilla. En lugar de tener que escribir manualmente una vista que haga la redirección, puedes usar RedirectView para hacerlo con solo un par de configuraciones.
+"""
 urlpatterns = [
     path("admin/", admin.site.urls), 
     path('catalog/', include('catalog.urls')),

@@ -1,0 +1,68 @@
+{% extends "catalog/base_generic.html" %}
+
+{% block content %}
+  <h1>Author: {{ author.last_name }}, {{author.first_name}}</h1>
+
+  {% if author.date_of_birth %}
+  ({{author.date_of_birth}} -
+  {% if author.date_of_death %}
+  {{author.date_of_death}}
+  {% endif %})
+{% endif %}
+  <!-- author detail link not yet defined -->
+  <p><strong>Books</strong></p>
+  {% for book in books %}
+    <li><a href="{{book.get_absolute_url}}">{{book.title}} #{{forloop.counter}}</a></li>
+    
+    <p class="short-description col-7 summary">{{ book.summary|truncatechars:100 }}
+    
+    <!-- Texto completo, oculto inicialmente -->
+    <p class="full-description col-7 summary" style="display:none;">{{ book.summary }}</p>
+    <a href="javascript:void(0);" class="toggle-description pt-0">ver más</a>
+    
+  {% endfor %}
+ 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Seleccionamos todos los enlaces "Ver más"
+        var toggles = document.querySelectorAll('.toggle-description');
+
+        toggles.forEach(function(toggle) {
+            toggle.addEventListener('click', function() {
+                var shortDescription = this.previousElementSibling.previousElementSibling;
+                var fullDescription = this.previousElementSibling;
+                
+                if (fullDescription.style.display === 'none') {
+                    // Mostrar la descripción completa
+                    shortDescription.style.display = 'none';
+                    fullDescription.style.display = 'block';
+                    this.textContent = 'Ver menos';  // Cambiar el enlace a "Ver menos"
+                } else {
+                    // Ocultar la descripción completa
+                    shortDescription.style.display = 'block';
+                    fullDescription.style.display = 'none';
+                    this.textContent = 'Ver más';  // Cambiar el enlace a "Ver más"
+                }
+            });
+        });
+    });
+</script>
+<!--
+  <p>Total books: <span id="total-books"></span></p>
+
+<script>
+    // JavaScript para sumar las iteraciones
+    document.addEventListener('DOMContentLoaded', function() {
+        // Selecciona todos los elementos con la clase 'book-item'
+        var bookItems = document.querySelectorAll('.book-item');
+        
+        // Cuenta cuántos hay
+        var totalBooks = bookItems.length;
+
+        // Muestra el total en el elemento con el id 'total-books'
+        document.getElementById('total-books').textContent = totalBooks;
+    });
+</script>-->
+
+{% endblock %}
+
