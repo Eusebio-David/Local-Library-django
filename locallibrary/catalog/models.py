@@ -37,7 +37,9 @@ from django.db.models import UniqueConstraint
 """
 from django.db.models.functions import Lower
 import uuid
-
+from django.conf import settings
+from django.contrib.auth.models import User
+from datetime import date
 
 # Create your models here.
 
@@ -128,7 +130,7 @@ class BookInstance(models.Model):
     imprint = models.CharField(max_length=200)
     #Fecha (en la que se espera que el libro esté disponible después de haber sido prestado o en mantenimiento).
     due_back = models.DateField(null=True, blank=True)
-
+    borrower = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     LOAN_STATUS = (
         ('m', 'Maintenance'),
         ('o', 'On loan'),
@@ -141,9 +143,14 @@ class BookInstance(models.Model):
     
     class Meta:
         ordering = ['due_back']
+        permissions = (("can_mark_returned", "Set book as returned"),)
 
     def __str__(self):
         return f'{self.id}({self.book.title})'
+    
+    def is_overdue(self):
+        """Determinamos si el libro esta vencido en cuanto a la fecha de devolucion y la actual """
+        return bool(self.due_back and date.today()>self.due_back)
     
 class Author(models.Model):
     first_name = models.CharField(max_length=100)

@@ -16,4 +16,8 @@
         <li><strong>Genres: </strong>{{ num_genres }}</li>
         <li><strong>Books with one word in the title: </strong>{{ book_specific_word }}</li>
     </ul>
+
+    <p>
+        You have visited this page {{ num_visits }} time{{ num_visits|pluralize }}.
+    </p>
 {% endblock %}
