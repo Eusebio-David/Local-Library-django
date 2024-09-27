@@ -11,3 +11,11 @@
 .summary{
     margin-bottom: 0.1rem!important;
 }
+#logout-form {
+    display: inline;
+  }
+  #logout-form button {
+    padding: 0;
+    margin: 0;
+  }
+  
