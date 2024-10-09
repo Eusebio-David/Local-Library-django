@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.utils.text import slugify
 """
     Se utiliza UniqueContraint para definir restricciones a nivel de base de datos
     en uno o mas campos de un modelo.
@@ -141,6 +142,16 @@ class BookInstance(models.Model):
     status = models.CharField(max_length=1, choices=LOAN_STATUS, blank=True, default='m',
                               help_text="Book availability")
     
+    slug = models.SlugField(max_length=200, unique=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        # Generar el slug automáticamente a partir del imprint o cualquier otro campo
+        if not self.slug:
+            self.slug = slugify(self.book.title)
+        super().save(*args, **kwargs)
+    
+    
+    
     class Meta:
         ordering = ['due_back']
         permissions = (("can_mark_returned", "Set book as returned"),)
@@ -151,6 +162,8 @@ class BookInstance(models.Model):
     def is_overdue(self):
         """Determinamos si el libro esta vencido en cuanto a la fecha de devolucion y la actual """
         return bool(self.due_back and date.today()>self.due_back)
+    
+   
     
 class Author(models.Model):
     first_name = models.CharField(max_length=100)

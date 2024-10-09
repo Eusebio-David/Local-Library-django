@@ -1,0 +1,30 @@
+{% extends 'catalog/base_generic.html' %}
+{% block title %}All instances books{% endblock title %}
+
+{% block content %}
+    {%if perms.catalog.can_mark_returned %}
+        {% if bookinstance_list %}
+        <h1>All Instances Books</h1>
+        <ul>
+            {% for bookinst in bookinstance_list %}
+                <li class="{%if bookinst.is_overdue%}text-danger{%endif%}">
+                    <a href="{%url 'book_detail' bookinst.book.pk %}">{{bookinst.book.title}}</a> -
+                    <a href="{% url 'renew-book-librarian' bookinst.id %}">Renew</a>
+
+                    {% if bookinst.due_back %}
+                        ({{bookinst.due_back}}) -
+                    {%else%}
+                        Has no return date -
+                    {% endif %}
+                    {%if bookinst.borrower%}{{bookinst.borrower}}{%else%} Don't have any user asigment{%endif%}
+                    
+                    
+                </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    {%else%}
+        <p>Your don't view this page. Only Librarians</p>
+    {%endif%}
+{% endblock content %}
+

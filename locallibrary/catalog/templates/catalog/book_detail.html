@@ -1,6 +1,40 @@
 {% extends "catalog/base_generic.html" %}
+{% block sidebar %}
+  {{ block.super }}
 
+  {% if perms.catalog.change_book or perms.catalog.delete_book %}
+  <hr>
+  <ul class="sidebar-nav">
+    {% if perms.catalog.change_book %}
+      <li><a href="{% url 'update-book' book.id %}">Update book</a></li>
+    {% endif %}
+    
+    {% if not book.bookintance_set.all and perms.catalog.delete_book %}
+      <li><a href="{%url 'book-delete' book.pk %}">Delete book</a></li>
+    {% endif %}
+    </ul>
+  {% endif %}
+
+{% endblock %}
 {% block content %}
+  {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+    <div class="alert {{ message.tags }}" style="background-color: lightcyan; border-radius: 3%; width: 35%;">
+      {{ message }}
+    </div>
+  {% endfor %}
+  </ul>
+  <script>
+    // Espera 3 segundos (3000 ms) y luego oculta el mensaje
+    setTimeout(function() {
+      const messages = document.querySelectorAll('.alert');
+      messages.forEach(function(message) {
+        message.style.display = 'none';
+      });
+    }, 3000);  // Puedes ajustar el tiempo a tu gusto
+  </script>
+{% endif %}
   <h1>Title: {{ book.title }}</h1>
 
   <p><strong>Author:</strong> <a href="{%url 'author_detail' book.author.id %}">{{ book.author }}</a></p>
@@ -9,24 +43,29 @@
   <p><strong>ISBN:</strong> {{ book.isbn }}</p>
   <p><strong>Language:</strong> {{ book.language }}</p>
   <p><strong>Genre:</strong> {{ book.genre.all|join:", " }}</p>
-
+  
   <div style="margin-left:20px;margin-top:20px">
     <h4>Copies</h4>
-
+    {% if book.bookinstance_set.all %}
     {% for copy in book.bookinstance_set.all %}
       <hr />
+      <p><a href="{%url 'detail-book-instance' copy.slug %}">{{copy}}</a></p>
       <p
         class="{% if copy.status == 'a' %}text-success{% elif copy.status == 'm' %}text-danger{% else %}text-warning{% endif %}">
         {{ copy.get_status_display }}
       </p>
       {% if copy.status == 'm' %}
-        <p><strong>This book is not date to return. Book in Maintenance.</p>
+        <p><strong>This instance is not date to return. Book in Maintenance.</p>
         
       {%elif copy.status != 'a' %}
         <p><strong>Due to be returned:</strong> {{ copy.due_back }}</p>
+      
+        <p><strong>Imprint:</strong> {{ copy.imprint }}</p>
+        <p class="text-muted"><strong>Id:</strong> {{ copy.id }}</p>
       {% endif %}
-      <p><strong>Imprint:</strong> {{ copy.imprint }}</p>
-      <p class="text-muted"><strong>Id:</strong> {{ copy.id }}</p>
     {% endfor %}
+    {% else %}
+          <p><strong>This book is not copy</strong></p>
+    {%endif%}
   </div>
 {% endblock %}

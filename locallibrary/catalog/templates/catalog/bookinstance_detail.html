@@ -1,0 +1,43 @@
+{% extends "catalog/base_generic.html" %}
+{% block sidebar %}
+  {{ block.super }}
+
+  {% if perms.catalog.change_bookinstance or perms.catalog.delete_bookinstance %}
+  <hr>
+  <ul class="sidebar-nav">
+    {% if not book.bookintance_set.all and perms.catalog.delete_book %}
+      <li><a href="{%url 'bookinstance-delete' bookinstance.slug%}">Delete Instance book</a></li>
+    {% endif %}
+    </ul>
+  {% endif %}
+
+{% endblock %}
+{% block content %}
+  {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+    <div class="alert {{ message.tags }}" style="background-color: lightcyan; border-radius: 3%; width: 35%;">
+      {{ message }}
+    </div>
+  {% endfor %}
+  </ul>
+  <script>
+    // Espera 3 segundos (3000 ms) y luego oculta el mensaje
+    setTimeout(function() {
+      const messages = document.querySelectorAll('.alert');
+      messages.forEach(function(message) {
+        message.style.display = 'none';
+      });
+    }, 3000);  // Puedes ajustar el tiempo a tu gusto
+  </script>
+{% endif %}
+  <h1>Book Instance: {{ bookinstance }} </h1>
+
+  <p><strong>Book:</strong> <a href="{%url 'book_detail' bookinstance.book.pk %}">{{ bookinstance.book }}</a></p>
+  <!-- author detail link not yet defined -->
+  <p><strong>Status:</strong> {{ bookinstance.get_status_display }}</p>
+  
+  <p><strong>Borrowd:</strong> {{ bookinstance.borrower }}</p>
+  <p><strong>Due back:</strong> {{ bookinstance.due_back}}</p>
+  
+{% endblock %}

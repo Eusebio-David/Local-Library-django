@@ -1,5 +1,23 @@
 {% extends 'catalog/base_generic.html' %}
 {% block content %}
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+    <div class="alert {{ message.tags }}" style="background-color: lightcyan; border-radius: 3%; width: 35%;">
+      {{ message }}
+    </div>
+  {% endfor %}
+    </ul>
+        <script>
+    // Espera 3 segundos (3000 ms) y luego oculta el mensaje
+        setTimeout(function() {
+        const messages = document.querySelectorAll('.alert');
+        messages.forEach(function(message) {
+            message.style.display = 'none';
+        });
+        }, 3000);  // Puedes ajustar el tiempo a tu gusto
+    </script>
+{% endif %}
     <h1>Book List</h1>
     {% if book_list %}
         <ul>
