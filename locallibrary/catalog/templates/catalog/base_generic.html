@@ -23,6 +23,7 @@
                         <li><a class="menu-item" href="{% url 'index' %}">Home</a></li>
                         <li><a class="menu-item" href="{% url 'books' %}">All books</a></li>
                         <li><a class="menu-item" href="{% url 'authors' %}">All authors</a></li>
+                        <li><a class="menu-item" href="{% url 'books-instances' %}">All Instances</a></li>
                     </ul>
                     <ul class="sidebar-nav">
                     
@@ -44,10 +45,17 @@
                               <h6>Staff</h6>
                               <a href="{% url 'books-borrowed' %}">All borrewed</a>
                             </li>
-                            <li>{% if perms.catalog.add_author %}
-                              <li><a href="{% url 'author-create' %}">Create author</a></li>
-                           {% endif %}</li>
-                          
+                            <li> 
+                              {% if perms.catalog.add_author %}
+                                <li><a href="{% url 'author-create' %}">Create author</a></li>
+                                
+                              {% endif %}
+                            </li>
+                            <li>
+                              {% if perms.catalogo.create_book %}
+                                <li><a href="{% url 'book-create' %}">Create book</a></li>
+                              {% endif %}
+                            </li>
                           {%endif%}
                         
                       {% else %}

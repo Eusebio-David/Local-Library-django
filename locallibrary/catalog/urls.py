@@ -19,3 +19,15 @@ urlpatterns += [
     path('author/<int:pk>/update/', views.AuthorUpdate.as_view(), name='author-update'),
     path('author/<int:pk>/delete/', views.AuthorDelete.as_view(), name='author-delete'),
 ]
+
+urlpatterns += {
+    path('book/<int:pk>/update/', views.BookUpdate.as_view(), name='update-book'),
+    path('book/create/', views.BookCreate.as_view(), name='book-create'),
+    path('book/<int:pk>/delete/', views.BookDelete.as_view(), name = 'book-delete'),
+}
+urlpatterns += {
+    path('booksInstance/', views.BookInstances.as_view(), name='books-instances'),
+    path('bookInstance/<slug:slug>', views.BookInstanceDetail.as_view(), name='detail-book-instance'),
+    path('bookInstance/<slug:slug>/delete', views.BookInstanceDelete.as_view(), name='bookinstance-delete'),
+
+}

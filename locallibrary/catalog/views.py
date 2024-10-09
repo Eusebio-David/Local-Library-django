@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import Author
+from django.contrib import messages
 
 # Create your views here
 
@@ -135,7 +136,7 @@ def renew_book_librarian(request, pk):
     else:
         # si la request es GET, u otro metodo crea un formulario por default
         proposed_renewal_date = datetime.date.today() + datetime.timedelta(weeks=3)
-        form = RenewBookForm(initial={'due_back': proposed_renewal_date})
+        form =  RenewBookModelForm(initial={'due_back': proposed_renewal_date})
             
 
     context = {
@@ -173,4 +174,76 @@ class AuthorDelete(PermissionRequiredMixin, DeleteView):
         except Exception as e:
             return HttpResponseRedirect(
                 reverse("author-delete", kwargs={"pk": self.object.pk})
+            )
+
+#clases para editar, eliminar y crear una instancia de libro
+class BookUpdate(PermissionRequiredMixin, UpdateView):
+    model = Book
+    fields = '__all__'
+    permission_required = 'catalog.change_book'
+    
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'successfully updated book')
+        return super().form_valid(form)
+    
+class BookCreate(PermissionRequiredMixin, CreateView):
+    model = Book
+    fields = ['title', 'author', 'summary', 'isbn','genre', 'language']
+    permission_required = 'catalog.add_book'
+
+    def form_valid(self, form):
+        messages.success(self.request, 'successfully create book')
+        return super().form_valid(form)
+
+
+class BookDelete(PermissionRequiredMixin, DeleteView):
+    model = Book
+    success_url = reverse_lazy('books')
+    permission_required = 'catalog.delete_book'
+
+    def form_valid(self, form):
+        try:
+            self.object.delete()
+            messages.success(self.request,  'successfully delete book')
+            return HttpResponseRedirect(self.success_url)
+        except Exception as e:
+            return HttpResponseRedirect(
+                reverse("book-delete", kwargs={"pk": self.object.pk})
+            )
+
+
+#creamos vistas para las copias de los libros
+class BookInstances(LoginRequiredMixin, ListView):
+    model = BookInstance
+    template_name = 'catalog/book_instances.html'
+
+    def get_queryset(self):
+        return (
+            BookInstance.objects.all().order_by('status')
+        )
+
+
+
+class BookInstanceDetail(PermissionRequiredMixin, DetailView):
+    model = BookInstance
+    # Indicamos que se busca el objeto usando el slug
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+    template_name = 'catalog/bookinstance_detail.html'
+    permission_required = 'catalog.can_mark_returned'
+
+class BookInstanceDelete(PermissionRequiredMixin, DeleteView):
+    model = BookInstance
+    success_url = reverse_lazy('books')
+    permission_required = 'catalog.delete_instance'
+
+    def form_valid(self, form):
+        try:
+            self.object.delete()
+            messages.success(self.request,  'successfully delete instance book')
+            return HttpResponseRedirect(self.success_url)
+        except Exception as e:
+            return HttpResponseRedirect(
+                reverse("bookInstance-delete", kwargs={"slug": self.object.slug})
             )
